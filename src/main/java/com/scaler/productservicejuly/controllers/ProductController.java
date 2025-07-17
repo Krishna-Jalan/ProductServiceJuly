@@ -1,8 +1,10 @@
 package com.scaler.productservicejuly.controllers;
 
 import com.scaler.productservicejuly.exceptions.ProductNotFoundException;
+import com.scaler.productservicejuly.models.Category;
 import com.scaler.productservicejuly.models.Product;
 import com.scaler.productservicejuly.services.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,8 @@ import java.util.List;
 public class ProductController {
     private ProductService productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(@Qualifier("SelfProductService")
+                             ProductService productService) {
         this.productService = productService;
     }
 
@@ -48,13 +51,18 @@ public class ProductController {
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
-    public void deleteProduct(Long productId){
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable("id") Long productId){
+        productService.deleteProduct(productId);
 
     }
     @PatchMapping("/{id}")
-    public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
-    return null;
+    public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product)
+            throws ProductNotFoundException {
+        return productService.updateProduct(id, product);
     }
+
     @PutMapping("/{id}")
     public Product replaceProduct(@PathVariable("id") Long id, @RequestBody Product product) {
     return null;
@@ -68,4 +76,9 @@ public class ProductController {
 //
 //        return response;
 //    }
+    @PostMapping
+    public Product addNewProduct(@RequestBody Product product)
+    {
+        return productService.addNewProduct(product);
+    }
 }
